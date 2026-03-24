@@ -1,88 +1,143 @@
-// Generalized date parsing function
-function parseDate(dateString, inputFormat) {
-    dateString = dateString.trim();
+// ===== SIMPLE & REUSABLE DATE CONVERTER =====
+
+// Step 1: Define supported date formats
+const supportedFormats = [
+    "DD-MM-YYYY", "DD/MM/YYYY", "MM-DD-YYYY", "MM/DD/YYYY", 
+    "YYYY-MM-DD", "YYYY/MM/DD", "DD.MM.YYYY"
+];
+
+// Step 2: Determine separator and component positions
+function getFormatInfo(formatString) {
+    const separator = formatString.match(/[-/\.]/)[0];
+    const components = formatString.split(separator);
     
-    // If input format is auto-detect, try common formats
-    if (inputFormat === "auto") {
-        const commonFormats = [
-            "YYYY-MM-DD", "YYYY/MM/DD", "DD-MM-YYYY", "DD/MM/YYYY",
-            "MM-DD-YYYY", "MM/DD/YYYY", "DD.MM.YYYY"
-        ];
-        for (let format of commonFormats) {
-            const parsed = parseDate(dateString, format);
-            if (parsed && !isNaN(parsed)) return parsed;
-        }
-        return null;
-    }
-    
-    const patterns = {
-        "DD-MM-YYYY": /^(\d{1,2})-(\d{1,2})-(\d{4})$/,
-        "DD/MM/YYYY": /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,
-        "MM-DD-YYYY": /^(\d{1,2})-(\d{1,2})-(\d{4})$/,
-        "MM/DD/YYYY": /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/,
-        "YYYY-MM-DD": /^(\d{4})-(\d{1,2})-(\d{1,2})$/,
-        "YYYY/MM/DD": /^(\d{4})\/(\d{1,2})\/(\d{1,2})$/,
-        "DD.MM.YYYY": /^(\d{1,2})\.(\d{1,2})\.(\d{4})$/
+    return {
+        separator: separator,
+        components: components, // e.g., ["DD", "MM", "YYYY"]
+        pattern: new RegExp(`^(\\d{1,2})${separator === '.' ? '\\.' : separator}(\\d{1,2})${separator === '.' ? '\\.' : separator}(\\d{4})$`)
     };
+}
+
+// Step 3: Extract date components from input string
+function extractDateParts(dateString, formatInfo) {
+    const match = dateString.match(formatInfo.pattern);
     
-    const pattern = patterns[inputFormat];
-    if (!pattern) return null;
-    
-    const match = dateString.match(pattern);
     if (!match) return null;
     
-    let day, month, year;
+    // Create an object to store date parts
+    const parts = {
+        [formatInfo.components[0]]: parseInt(match[1]),
+        [formatInfo.components[1]]: parseInt(match[2]),
+        [formatInfo.components[2]]: parseInt(match[3])
+    };
     
-    if (inputFormat === "YYYY-MM-DD" || inputFormat === "YYYY/MM/DD") {
-        year = parseInt(match[1]);
-        month = parseInt(match[2]);
-        day = parseInt(match[3]);
-    } else if (inputFormat === "MM-DD-YYYY" || inputFormat === "MM/DD/YYYY") {
-        month = parseInt(match[1]);
-        day = parseInt(match[2]);
-        year = parseInt(match[3]);
-    } else {
-        day = parseInt(match[1]);
-        month = parseInt(match[2]);
-        year = parseInt(match[3]);
+    return parts;
+}
+
+// Step 4: Validate if date is correct (check valid day, month, year)
+function isValidDateValue(day, month, year) {
+    if (month < 1 || month > 12) return false;
+    if (day < 1) return false;
+    if (year < 1000 || year > 9999) return false;
+    
+    // Days in each month
+    const daysInMonth = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+    
+    // Handle leap year
+    if (year % 4 === 0 && (year % 100 !== 0 || year % 400 === 0)) {
+        daysInMonth[1] = 29;
     }
     
-    // Validate date
-    if (month < 1 || month > 12 || day < 1 || day > 31 || year < 1000 || year > 9999) {
+    return day <= daysInMonth[month - 1];
+}
+
+// Step 5: Create JavaScript Date object from parts
+function createDateObject(parts) {
+    const { DD, MM, YYYY } = parts;
+    
+    if (!isValidDateValue(DD || parts.day, MM || parts.month, YYYY || parts.year)) {
         return null;
     }
+    
+    const day = DD || parts.day;
+    const month = MM || parts.month;
+    const year = YYYY || parts.year;
     
     return new Date(year, month - 1, day);
 }
 
-// Generalized date formatting function
-function formatDate(date, outputFormat) {
-    if (!date || isNaN(date)) {
+// Step 6: Format date object into desired format
+function formatDateOutput(dateObject, outputFormat) {
+    if (!dateObject || isNaN(dateObject.getTime())) {
         return "Invalid Date";
     }
     
-    const pad = (n) => n.toString().padStart(2, '0');
-    const day = pad(date.getDate());
-    const month = pad(date.getMonth() + 1);
-    const year = date.getFullYear();
+    const day = dateObject.getDate().toString().padStart(2, '0');
+    const month = (dateObject.getMonth() + 1).toString().padStart(2, '0');
+    const year = dateObject.getFullYear();
+    const monthName = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"][dateObject.getMonth()];
     
-    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-    const monthFull = monthNames[date.getMonth()];
+    // Replace placeholders with actual values
+    return outputFormat
+        .replace(/DD/g, day)
+        .replace(/MM/g, month)
+        .replace(/YYYY/g, year)
+        .replace(/MMM/g, monthName);
+}
+
+// ===== MAIN FUNCTION: Convert Date to Desired Format =====
+/**
+ * Simple function to convert any date to desired format
+ * @param {string} inputDate - The date string to convert (e.g., "25/12/2023")
+ * @param {string} inputFormat - Format of input date (e.g., "DD/MM/YYYY")
+ * @param {string} outputFormat - Desired output format (e.g., "YYYY-MM-DD")
+ * @returns {string} - Formatted date or error message
+ */
+function convertDateFormat(inputDate, inputFormat, outputFormat) {
+    // Validate inputs
+    if (!inputDate || !inputFormat || !outputFormat) {
+        return "Error: Please provide date, input format, and output format";
+    }
     
-    const formatMap = {
-        "DD-MM-YYYY": `${day}-${month}-${year}`,
-        "DD/MM/YYYY": `${day}/${month}/${year}`,
-        "YYYY-MM-DD": `${year}-${month}-${day}`,
-        "YYYY/MM/DD": `${year}/${month}/${day}`,
-        "MM/DD/YYYY": `${month}/${day}/${year}`,
-        "MM-DD-YYYY": `${month}-${day}-${year}`,
-        "DD.MM.YYYY": `${day}.${month}.${year}`,
-        "MMM DD, YYYY": `${monthFull} ${pad(date.getDate())}, ${year}`,
-        "DD MMM YYYY": `${day} ${monthFull} ${year}`
-    };
+    // Check if formats are supported
+    if (!supportedFormats.includes(inputFormat) && inputFormat !== "auto") {
+        return `Error: Input format '${inputFormat}' is not supported`;
+    }
     
-    return formatMap[outputFormat] || "Unsupported format";
+    if (!supportedFormats.includes(outputFormat) && outputFormat !== "MMM DD, YYYY" && outputFormat !== "DD MMM YYYY") {
+        return `Error: Output format '${outputFormat}' is not supported`;
+    }
+    
+    // Trim whitespace
+    inputDate = inputDate.trim();
+    
+    // Handle auto-detect
+    if (inputFormat === "auto") {
+        for (let format of supportedFormats) {
+            const result = convertDateFormat(inputDate, format, outputFormat);
+            if (!result.includes("Error") && !result.includes("Invalid")) {
+                return result;
+            }
+        }
+        return "Error: Could not detect date format";
+    }
+    
+    // Step-by-step conversion
+    const formatInfo = getFormatInfo(inputFormat);
+    const dateParts = extractDateParts(inputDate, formatInfo);
+    
+    if (!dateParts) {
+        return `Error: Date does not match format ${inputFormat}`;
+    }
+    
+    const dateObject = createDateObject(dateParts);
+    
+    if (!dateObject) {
+        return "Error: Invalid date (check day/month values)";
+    }
+    
+    const result = formatDateOutput(dateObject, outputFormat);
+    return result;
 }
 
 function convertDate() {
@@ -95,14 +150,8 @@ function convertDate() {
         return;
     }
     
-    const parsedDate = parseDate(input, inputFormat);
-    
-    if (!parsedDate) {
-        document.getElementById("result").innerText = `Invalid date format. Please use ${inputFormat === "auto" ? "a valid date format" : inputFormat}`;
-        return;
-    }
-    
-    const result = formatDate(parsedDate, outputFormat);
+    // Use the main conversion function
+    const result = convertDateFormat(input, inputFormat, outputFormat);
     document.getElementById("result").innerText = result;
 }
 
