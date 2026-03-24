@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en"></html>
+<head>
+    <meta charset="UTF-8">
+    <title>Data Formatter</title>
+<link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <div class="current-date-box">
+        <h3>Today's Date</h3>
+        <div id="currentDate" class="date-display"></div>
+        <div id="currentTime" class="time-display"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Date Formatter</h2>
+    <label>Enter Date:</label>
+<input type="text" id="inputDate" placeholder="e.g., 25/12/2023, 2023-12-25, 12-25-2023">
+<label>Select Input Format:</label>
+<select id="inputFormat">
+    <option value="auto">Auto-Detect</option>
+    <option value="DD-MM-YYYY">DD-MM-YYYY</option>
+    <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+    <option value="MM-DD-YYYY">MM-DD-YYYY</option>
+    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+    <option value="YYYY/MM/DD">YYYY/MM/DD</option>
+    <option value="DD.MM.YYYY">DD.MM.YYYY</option>
+</select>
+<label>Select Output Format:</label>
+<select id="outputFormat">
+    <option value="DD-MM-YYYY">DD-MM-YYYY</option>
+    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
+    <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+    <option value="YYYY/MM/DD">YYYY/MM/DD</option>
+    <option value="DD.MM.YYYY">DD.MM.YYYY</option>
+    <option value="MMM DD, YYYY">MMM DD, YYYY</option>
+    <option value="DD MMM YYYY">DD MMM YYYY</option>
+</select>
+<button onclick="convertDate()">Convert</button>
+    <div id="result"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
