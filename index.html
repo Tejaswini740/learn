@@ -1,47 +1,39 @@
 <!DOCTYPE html>
-<html lang="en"></html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Data Formatter</title>
+    <title>Universal Date Formatter</title>
 <link rel="stylesheet" href="style.css">
 
 </head>
 <body>
-    <div class="current-date-box">
-        <h3>Today's Date</h3>
-        <div id="currentDate" class="date-display"></div>
-        <div id="currentTime" class="time-display"></div>
-    </div>
+    
     
     <div class="container">
-        <h2>Date Formatter</h2>
-    <label>Enter Date:</label>
-<input type="text" id="inputDate" placeholder="e.g., 25/12/2023, 2023-12-25, 12-25-2023">
-<label>Select Input Format:</label>
-<select id="inputFormat">
-    <option value="auto">Auto-Detect</option>
-    <option value="DD-MM-YYYY">DD-MM-YYYY</option>
-    <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-    <option value="MM-DD-YYYY">MM-DD-YYYY</option>
-    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-    <option value="YYYY/MM/DD">YYYY/MM/DD</option>
-    <option value="DD.MM.YYYY">DD.MM.YYYY</option>
-</select>
-<label>Select Output Format:</label>
+        <h2>Universal Date Formatter</h2>
+  
+<input type="text" id="inputDate" placeholder="Enter Input">
+
+
 <select id="outputFormat">
-    <option value="DD-MM-YYYY">DD-MM-YYYY</option>
-    <option value="YYYY-MM-DD">YYYY-MM-DD</option>
-    <option value="MM/DD/YYYY">MM/DD/YYYY</option>
-    <option value="DD/MM/YYYY">DD/MM/YYYY</option>
-    <option value="YYYY/MM/DD">YYYY/MM/DD</option>
-    <option value="DD.MM.YYYY">DD.MM.YYYY</option>
-    <option value="MMM DD, YYYY">MMM DD, YYYY</option>
-    <option value="DD MMM YYYY">DD MMM YYYY</option>
+  <option value="">Select Output Format</option>  
+    <option value= "en-GB">DD/MM/YYYY</option>
+    <option value= "dash">DD-MM-YYYY</option>
+     <option value= "en-US">MM/DD/YYYY</option>
+      <option value= "iso">YYYY-MM-DD</option>
+       <option value= "longUS">Month Date Year</option>
+        <option value= "longGB">Date Month Year</option>
 </select>
 <button onclick="convertDate()">Convert</button>
-    <div id="result"></div>
-    </div>
+<div class="result-box">
+    <h3>Converted Date </h3>
+    <p id="result">--</p>
+</div>
+<div class="result-box">
+    <h3>Current Date</h3>
+    <p id="currentDate">--</p>
+</div>
+</div>
     <script src="script.js"></script>
 </body>
 </html>
