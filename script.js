@@ -58,7 +58,8 @@ if (!date) {
 document.getElementById("result").innerText = "Invalid date";
 return;
 }
-document.getElementById("result").innerText = formatOutput(date, type); 
+document.getElementById("result").innerText = formatOutput(date, type);
+console.log(formatOutput(date, type)); 
 let today = new Date(); 
 document.getElementById("currentDate").innerText = formatOutput(today, type);
 }
